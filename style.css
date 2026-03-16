@@ -1,0 +1,62 @@
+/* あとで要素を中央揃えして上レイヤーに載せる．下レイヤーの背景としては水玉か斜めストライプが可愛いか？ */
+body {
+  background: #faf9f7;
+  color: #444;
+  font-family: sans-serif;
+  text-align: center;
+}
+
+canvas {
+  background: #ffffff;
+  border: 2px solid #7edcff;
+  cursor: crosshair;
+  margin-top: 10px;
+  border-radius: 8px;
+}
+
+controls {
+  background: #fff;
+  padding: 20px;
+  display: inline-block;
+  border-radius: 12px;
+  margin-top: 20px;
+  border: 1px solid #ffd4a8;
+}
+
+.slider-group {
+  margin: 15px 0;
+  text-align: left;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: #ff9f5f;
+  font-size: 0.8rem;
+}
+
+input[type="range"] {
+  width: 250px;
+  accent-color: #7edcff;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  background: #ff9f5f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: #ff8a3a;
+}
+
+.val {
+  color: #7edcff;
+  font-weight: bold;
+  margin-left: 10px;
+}
