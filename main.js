@@ -1,4 +1,5 @@
 let audioCtx, panner, source, gainNode;
+let spaceX, spaceZ;
 let isDragging = false;
 
 const startBtn = document.getElementById('startBtn');
@@ -60,11 +61,46 @@ canvas.addEventListener('mousemove', (e) => {
     const normX = x / canvas.width;
     const normY = y / canvas.height;
 
-    const spaceX = (normX - 0.5) * 10;
-    const spaceZ = (normY - 0.5) * 10;
+    spaceX = (normX - 0.5) * 10;
+    spaceZ = (normY - 0.5) * 10;
 
     const now = audioCtx.currentTime;
     panner.positionX.setTargetAtTime(spaceX, now, 0.05);
     panner.positionZ.setTargetAtTime(spaceZ, now, 0.05);
+
 });
 
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 方向表示
+    ctx.fillStyle = "rgb(177, 177, 177)";
+    ctx.font = "16px sans-serif";
+    ctx.fillText("Front", canvas.width / 2 - 20, 30);
+    ctx.fillText("Rear", canvas.width / 2 - 20, canvas.height - 20);
+
+    ctx.fillText("Left", 20, canvas.height / 2);
+    ctx.fillText("Right", canvas.width - 60, canvas.height / 2);
+
+    // リスナーを描画
+    ctx.fillStyle = "#000000";
+    ctx.beginPath();
+    ctx.arc(canvas.width / 2, canvas.height / 2, 10, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 音源の描画
+    if (panner) {
+        const drawX = (spaceX + 5) / 10 * canvas.width;
+        const drawZ = (spaceZ + 5) / 10 * canvas.height;
+        ctx.fillStyle = "#007bff";
+        ctx.beginPath();
+        ctx.arc(drawX, drawZ, 8, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    requestAnimationFrame(draw);
+}
+
+canvas.width = canvas.clientWidth;
+canvas.height = canvas.clientHeight;
+draw()
