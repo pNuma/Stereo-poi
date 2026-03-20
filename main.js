@@ -1,12 +1,18 @@
-let audioCtx, panner, source, gainNode;
-let spaceX, spaceZ;
+let audioCtx, source, analyser, gate, panner, masterGain;
+let spaceX = 0, spaceZ = 0;
 let isDragging = false;
+let threshold = 0.02;
 
 const startBtn = document.getElementById('startBtn');
 const gateSlider = document.getElementById('gateSlider');
 const gainSlider = document.getElementById('gainSlider');
 const canvas = document.getElementById('visualizer');
 const ctx = canvas.getContext('2d');
+
+function initPosition() {
+    spaceX = 1;
+    spaceZ = 0;
+}
 
 startBtn.onclick = async () => {
     if (audioCtx) return;
@@ -20,22 +26,61 @@ startBtn.onclick = async () => {
         }
     });
 
+    initPosition();
+
     source = audioCtx.createMediaStreamSource(stream);
-    gainNode = audioCtx.createGain();
+
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 1024;
+
+    gate = audioCtx.createGain();
+    masterGain = audioCtx.createGain();
 
     panner = new PannerNode(audioCtx, {
         panningModel: 'HRTF',
         distanceModel: 'inverse',
         rolloffFactor: 5,
         refDistance: 1,
-        positionX: 1,
+        positionX: spaceX,
         positionY: 0,
-        positionZ: -1
+        positionZ: spaceZ
     });
 
-    source.connect(panner);
-    panner.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
+    source.connect(analyser);
+    source.connect(gate);
+
+    gate.connect(panner);
+    panner.connect(masterGain);
+    masterGain.connect(audioCtx.destination);
+
+    updateGate();
+};
+
+// スライダー操作
+gateSlider.oninput = (e) => {
+    threshold = parseFloat(e.target.value);
+    document.getElementById('gateVal').innerText = threshold.toFixed(3);
+};
+gainSlider.oninput = (e) => {
+    masterGain.gain.setTargetAtTime(parseFloat(e.target.value), audioCtx.currentTime, 0.05);
+    document.getElementById('gainVal').innerText = e.target.value;
+};
+
+
+function updateGate() {
+requestAnimationFrame(updateGate);
+
+    const data = new Float32Array(analyser.fftSize);
+    analyser.getFloatTimeDomainData(data);
+
+    let sum = 0;
+    for (let i = 0; i < data.length; i++) {
+        sum += data[i] * data[i];
+    }
+    const rms = Math.sqrt(sum / data.length);
+
+    const target = rms > threshold ? 1.0 : 0.0;
+    gate.gain.setTargetAtTime(target, audioCtx.currentTime, 0.03);
 }
 
 //マウス操作
@@ -70,6 +115,7 @@ canvas.addEventListener('mousemove', (e) => {
 
 });
 
+//キャンバスの描画
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -89,15 +135,13 @@ function draw() {
     ctx.fill();
 
     // 音源の描画
-    if (panner) {
-        const drawX = (spaceX + 5) / 10 * canvas.width;
-        const drawZ = (spaceZ + 5) / 10 * canvas.height;
-        ctx.fillStyle = "#007bff";
-        ctx.beginPath();
-        ctx.arc(drawX, drawZ, 8, 0, Math.PI * 2);
-        ctx.fill();
-    }
+    const drawX = ((panner ? spaceX : 0) + 5) / 10 * canvas.width;
+    const drawZ = ((panner ? spaceZ : 0) + 5) / 10 * canvas.height;
 
+    ctx.fillStyle = "#007bff";
+    ctx.beginPath();
+    ctx.arc(drawX, drawZ, 8, 0, Math.PI * 2);
+    ctx.fill();
     requestAnimationFrame(draw);
 }
 
