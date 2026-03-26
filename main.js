@@ -57,14 +57,21 @@ startBtn.onclick = async () => {
 };
 
 // スライダー操作
-gateSlider.oninput = (e) => {
-    threshold = parseFloat(e.target.value);
-    document.getElementById('gateVal').innerText = threshold.toFixed(3);
-};
-gainSlider.oninput = (e) => {
-    masterGain.gain.setTargetAtTime(parseFloat(e.target.value), audioCtx.currentTime, 0.05);
-    document.getElementById('gainVal').innerText = e.target.value;
-};
+gateSlider.addEventListener('input', (e) => {
+    const val = parseFloat(e.target.value);
+    document.getElementById('gateVal').innerText = val.toFixed(3);
+
+    threshold = val;
+});
+
+gainSlider.addEventListener('input', (e) => {
+    const val = parseFloat(e.target.value);
+    document.getElementById('gainVal').innerText = val.toFixed(1);
+    
+    if (masterGain) {
+        masterGain.gain.setTargetAtTime(val, audioCtx.currentTime, 0.05);
+    }
+});
 
 
 function updateGate() {
