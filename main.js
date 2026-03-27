@@ -4,6 +4,7 @@ let isDragging = false;
 let threshold = 0.02;
 
 const startBtn = document.getElementById('startBtn');
+const recordBtn = document.getElementById('recordBtn');
 const gateSlider = document.getElementById('gateSlider');
 const gainSlider = document.getElementById('gainSlider');
 const canvas = document.getElementById('visualizer');
@@ -66,7 +67,7 @@ gateSlider.addEventListener('input', (e) => {
 
 gainSlider.addEventListener('input', (e) => {
     const val = parseFloat(e.target.value);
-    document.getElementById('gainVal').innerText = val.toFixed(1);
+    document.getElementById('gainVal').innerText = val.toFixed(2);
     
     if (masterGain) {
         masterGain.gain.setTargetAtTime(val, audioCtx.currentTime, 0.05);

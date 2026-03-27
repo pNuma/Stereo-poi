@@ -7,23 +7,24 @@
     <title>SonicPositioner</title>
 </head>
 <body>
-    <h1>SonicPositioner</h1>
-    
-    <div class="controls">
-        <button id="startBtn">START</button>
-        <div class="slider-group">
-            <label>Noise Gate Threshold (ノイズ抑制しきい値)</label>
-            <input type="range" id="gateSlider" min="0" max="0.1" step="0.001" value="0.01">
-            <span id="gateVal" class="val">0.020</span>
+    <div class="content">
+        <h1>SonicPositioner</h1>
+        <div class="controls">
+            <button id="startBtn">START</button>
+            <button id="recordBtn">RECORD</button>
+            <div class="slider-group">
+                <label>Noise Gate Threshold (ノイズ抑制しきい値)</label>
+                <input type="range" id="gateSlider" min="0" max="0.1" step="0.001" value="0.01">
+                <span id="gateVal" class="val">0.020</span>
+            </div>
+            <div class="slider-group">
+                <label>Master Gain (音量調節)</label>
+                <input type="range" id="gainSlider" min="0" max="1.5" step="0.1" value="0.8">
+                <span id="gainVal" class="val">0.8</span>
+            </div>
         </div>
-        <div class="slider-group">
-            <label>Master Gain (音量調節)</label>
-            <input type="range" id="gainSlider" min="0" max="1.5" step="0.1" value="0.8">
-            <span id="gainVal" class="val">0.8</span>
-        </div>
+        <br>
+        <canvas id="visualizer" width="400" height="400"></canvas>
     </div>
-
-    <br>
-    <canvas id="visualizer" width="600" height="400"></canvas>
     <script src="main.js"></script>
 </html>

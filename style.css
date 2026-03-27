@@ -1,62 +1,147 @@
-/* あとで要素を中央揃えして上レイヤーに載せる．下レイヤーの背景としては水玉か斜めストライプが可愛いか？ */
+:root{
+  --blue: #7edcff;
+  --orange: #ff9f5f;
+  --soft-orange: #ffd4a8;
+  --card-bg: #fffef6;
+  --text: #333333;
+  --radius: 12px;
+}
+
+html, body {
+  height: 100%;
+}
 body {
-  background: #faf9f7;
-  color: #444;
-  font-family: sans-serif;
+  margin: 0;
+  font-family: "Poppins", "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color: var(--text);
+  background: #ffffff;
+  position: relative;
+  overflow-x: hidden;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100dvh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      #e8f4ff 0,
+      #e8f4ff 10px,
+      #ffffff 10px,
+      #ffffff 20px
+    );
+  z-index: -99;
+  opacity: 0.9;
+}
+
+.content {
+  background: var(--card-bg);
+  position: relative;
+  z-index: 2;
+
+  width: auto;
+  max-height: 90dvh;
+  padding: 28px;
+  box-sizing: border-box;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(30,40,50,0.06);
+  border: 1px solid rgba(0,0,0,0.04);
+  overflow: auto;
   text-align: center;
 }
 
-canvas {
-  background: #ffffff;
-  border: 2px solid #7edcff;
-  cursor: crosshair;
-  margin-top: 10px;
-  border-radius: 8px;
+h1 {
+  font-family: "Poppins", "Nunito", sans-serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0 0 18px 0;
+
+  color: var(--blue);
+  text-shadow: 0 2px 0 var(--soft-orange);
+  letter-spacing: -0.5px;
 }
 
-controls {
-  background: #fff;
-  padding: 20px;
+.controls {
+  background: rgba(255,255,255,0.9);
+  padding: 18px 22px;
   display: inline-block;
-  border-radius: 12px;
-  margin-top: 20px;
-  border: 1px solid #ffd4a8;
+  border-radius: var(--radius);
+  margin-top: 18px;
+  border: 2px solid var(--soft-orange);
+  box-shadow: 0 6px 18px rgba(30,40,50,0.04);
+  text-align: center;
+  width: 85%;
 }
 
 .slider-group {
-  margin: 15px 0;
+  margin: 12px 0;
   text-align: left;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 label {
   display: block;
-  margin-bottom: 5px;
-  color: #ff9f5f;
-  font-size: 0.8rem;
+  margin-bottom: 6px;
+  color: var(--orange);
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
 input[type="range"] {
-  width: 250px;
-  accent-color: #7edcff;
+  width: 100%;
+  accent-color: var(--blue);
+  height: 6px;
 }
 
 button {
-  padding: 10px 20px;
+  padding: 10px 18px;
   font-size: 1rem;
   cursor: pointer;
-  background: #ff9f5f;
+  background: var(--orange);
   color: white;
   border: none;
-  border-radius: 6px;
-  transition: background 0.2s;
+  border-radius: 8px;
+  transition: background 0.18s, transform 0.08s;
+  box-shadow: 0 6px 14px rgba(255,159,95,0.12);
 }
-
-button:hover {
-  background: #ff8a3a;
-}
+button:hover { background: #ff8a3a; transform: translateY(-1px); }
+button:active { transform: translateY(0); }
 
 .val {
-  color: #7edcff;
-  font-weight: bold;
+  color: var(--blue);
+  font-weight: 700;
   margin-left: 10px;
+}
+
+canvas {
+  background: #ffffff;
+  border: 2px solid var(--soft-orange);
+  cursor: crosshair;
+  margin-top: 14px;
+  border-radius: 10px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 100%;
+}
+
+small {
+  color: rgba(0,0,0,0.55);
+  font-size: 0.82rem;
+}
+
+button:focus, input[type="range"]:focus {
+  outline: 3px solid rgba(126,220,255,0.18);
+  outline-offset: 3px;
+  border-radius: 8px;
 }
