@@ -78,6 +78,7 @@ h1 {
   border: 2px solid var(--soft-orange);
   box-shadow: 0 6px 18px rgba(30,40,50,0.04);
   text-align: center;
+
   width: 85%;
 }
 
@@ -103,7 +104,15 @@ input[type="range"] {
   height: 6px;
 }
 
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+
 button {
+  height: 40px;
   padding: 10px 18px;
   font-size: 1rem;
   cursor: pointer;
@@ -114,8 +123,25 @@ button {
   transition: background 0.18s, transform 0.08s;
   box-shadow: 0 6px 14px rgba(255,159,95,0.12);
 }
-button:hover { background: #ff8a3a; transform: translateY(-1px); }
+button:hover { background: var(--orange); transform: translateY(-1px); }
 button:active { transform: translateY(0); }
+
+#recordBtn {
+    height: auto; 
+    background: #ffffff;
+    color: var(--orange);
+    border-radius: var(--radius);
+    border: 2px solid var(--orange);
+    padding: 1px 8px;
+    cursor: pointer;
+    font-size: 0;
+}
+
+#recordBtn .icon {
+    font-size: 28px;
+    line-height: 1;
+}
+
 
 .val {
   color: var(--blue);

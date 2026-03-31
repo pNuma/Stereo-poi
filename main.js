@@ -78,15 +78,14 @@ startBtn.onclick = async () => {
 
   updateGate();
 };
-
 recordBtn.onclick = () => {
-  if (recorder.state === "inactive") {
-    recorder.start();
-    recordBtn.innerText = "DOWNLOAD";
-  } else {
-    recorder.stop();
-    recordBtn.innerText = "RECORD";
-  }
+    if (recorder.state === "inactive") {
+        recorder.start();
+        recordBtn.innerHTML = '<span class="icon">■</span>';
+    } else {
+        recorder.stop();
+        recordBtn.innerHTML = '<span class="icon">●</span>';
+    }
 };
 
 // スライダー操作
