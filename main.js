@@ -5,6 +5,7 @@ let isDragging = false;
 let threshold = 0.02;
 let destNode, recorder;
 let chunks = [];
+let analyserLeft, analyserRight;
 
 const startBtn = document.getElementById("startBtn");
 const recordBtn = document.getElementById("recordBtn");
@@ -76,16 +77,26 @@ startBtn.onclick = async () => {
     chunks = [];
   };
 
+  //左右の音量確認用
+  const splitter = audioCtx.createChannelSplitter(2);
+  analyserLeft = audioCtx.createAnalyser();
+  analyserRight = audioCtx.createAnalyser();
+  analyserLeft.fftSize = 2048;
+  analyserRight.fftSize = 2048;
+  masterGain.connect(splitter);
+  splitter.connect(analyserLeft, 0);
+  splitter.connect(analyserRight, 1);
+
   updateGate();
 };
 recordBtn.onclick = () => {
-    if (recorder.state === "inactive") {
-        recorder.start();
-        recordBtn.innerHTML = '<span class="icon">■</span>';
-    } else {
-        recorder.stop();
-        recordBtn.innerHTML = '<span class="icon">●</span>';
-    }
+  if (recorder.state === "inactive") {
+    recorder.start();
+    recordBtn.innerHTML = '<span class="icon">■</span>';
+  } else {
+    recorder.stop();
+    recordBtn.innerHTML = '<span class="icon">●</span>';
+  }
 };
 
 // スライダー操作
@@ -174,12 +185,32 @@ function draw() {
   // 音源の描画
   const drawX = (((panner ? spaceX : 0) + 5) / 10) * canvas.width;
   const drawZ = (((panner ? spaceZ : 0) + 5) / 10) * canvas.height;
-
   ctx.fillStyle = "#007bff";
   ctx.beginPath();
   ctx.arc(drawX, drawZ, 8, 0, Math.PI * 2);
   ctx.fill();
+
+  const leftRms = calcRms(analyserLeft);
+  const rightRms = calcRms(analyserRight);
+
+  ctx.fillStyle = "#7edcff";
+  ctx.font = "14px monospace";
+  ctx.fillText(`L: ${leftRms.toFixed(1)}`, canvas.width - 80, 30);
+  ctx.fillText(`R: ${rightRms.toFixed(1)}`, canvas.width - 80, 50);
+
   requestAnimationFrame(draw);
+}
+
+function calcRms(analyser) {
+  if (!analyser) return 0;
+  const data = new Float32Array(analyser.fftSize);
+  analyser.getFloatTimeDomainData(data);
+
+  let sum = 0;
+  for (let i = 0; i < data.length; i++) {
+    sum += data[i] * data[i];
+  }
+  return Math.sqrt(sum / data.length);
 }
 
 canvas.width = canvas.clientWidth;
