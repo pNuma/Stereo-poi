@@ -1,4 +1,4 @@
-let audioCtx, source, analyser, gate, panner, masterGain;
+let audioCtx, source, analyser, gate, panner, stereoPanner, masterGain;
 let spaceX = 0,
   spaceZ = 0;
 let isDragging = false;
@@ -44,18 +44,21 @@ startBtn.onclick = async () => {
   panner = new PannerNode(audioCtx, {
     panningModel: "HRTF",
     distanceModel: "inverse",
-    rolloffFactor: 5,
+    rolloffFactor: 2,
     refDistance: 1,
     positionX: spaceX,
     positionY: 0,
     positionZ: spaceZ,
   });
 
+  stereoPanner = audioCtx.createStereoPanner();
+
   source.connect(analyser);
   source.connect(gate);
 
   gate.connect(panner);
-  panner.connect(masterGain);
+  panner.connect(stereoPanner);
+  stereoPanner.connect(masterGain);
   masterGain.connect(audioCtx.destination);
 
   //録音用
@@ -161,6 +164,9 @@ canvas.addEventListener("mousemove", (e) => {
   const now = audioCtx.currentTime;
   panner.positionX.setTargetAtTime(spaceX, now, 0.05);
   panner.positionZ.setTargetAtTime(spaceZ, now, 0.05);
+  const dist = Math.hypot(spaceX, spaceZ);
+  const pan = dist === 0 ? 0 : spaceX / dist;
+  stereoPanner.pan.setTargetAtTime(pan, now, 0.05);
 });
 
 //キャンバスの描画
