@@ -182,19 +182,17 @@ function draw() {
   ctx.fillText("Left", 20, canvas.height / 2);
   ctx.fillText("Right", canvas.width - 60, canvas.height / 2);
 
-  // リスナーを描画
-  ctx.fillStyle = "#000000";
-  ctx.beginPath();
-  ctx.arc(canvas.width / 2, canvas.height / 2, 10, 0, Math.PI * 2);
-  ctx.fill();
+  // リスナー（自分）を中央に描画
+  ctx.font = '40px "Noto Sans Symbols 2", sans-serif';
+  ctx.fillStyle = "#ff9f5f";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("🎙", canvas.width / 2, canvas.height / 2);
 
-  // 音源の描画
-  const drawX = (((panner ? spaceX : 0) + 5) / 10) * canvas.width;
-  const drawZ = (((panner ? spaceZ : 0) + 5) / 10) * canvas.height;
-  ctx.fillStyle = "#007bff";
-  ctx.beginPath();
-  ctx.arc(drawX, drawZ, 8, 0, Math.PI * 2);
-  ctx.fill();
+  // 音源を計算した座標に描画
+  const drawX = ((spaceX + 5) / 10) * canvas.width;
+  const drawZ = ((spaceZ + 5) / 10) * canvas.height;
+  ctx.fillText("🔊", drawX, drawZ);
 
   const leftRms = calcRms(analyserLeft);
   const rightRms = calcRms(analyserRight);
