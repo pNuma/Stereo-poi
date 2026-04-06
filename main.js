@@ -1,39 +1,36 @@
 let audioCtx, source, analyser, gate, panner, stereoPanner, masterGain;
-let spaceX = 0,
-  spaceZ = 0;
+let spaceX = 0,spaceZ = 0;
 let isDragging = false;
 let threshold = 0.02;
 let destNode, recorder;
 let chunks = [];
 let analyserLeft, analyserRight;
 
-const startBtn = document.getElementById("startBtn");
+const micSelect = document.getElementById("micSelect");
 const recordBtn = document.getElementById("recordBtn");
 const gateSlider = document.getElementById("gateSlider");
 const gainSlider = document.getElementById("gainSlider");
 const canvas = document.getElementById("visualizer");
 const ctx = canvas.getContext("2d");
 
-function initPosition() {
-  spaceX = 1;
-  spaceZ = 0;
-}
 
-startBtn.onclick = async () => {
+async function init(deviceId) {
   if (audioCtx) return;
   audioCtx = new AudioContext({ latencyHint: "interactive" });
 
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: {
+      deviceId: { exact: deviceId },
       echoCancellation: false,
       noiseSuppression: false,
       autoGainControl: false,
     },
   });
 
-  initPosition();
+  spaceX = 1;
+  spaceZ = 0;
 
-  source = audioCtx.createMediaStreamSource(stream);
+source = audioCtx.createMediaStreamSource(stream);
 
   analyser = audioCtx.createAnalyser();
   analyser.fftSize = 1024;
@@ -91,7 +88,35 @@ startBtn.onclick = async () => {
   splitter.connect(analyserRight, 1);
 
   updateGate();
-};
+}
+
+async function setupMicList() {
+  try {
+    await navigator.mediaDevices.getUserMedia({ audio: true });
+    const devices = await navigator.mediaDevices.enumerateDevices();
+
+    micSelect.innerHTML = "";
+
+    const placeholder = document.createElement("option");
+    placeholder.textContent = "Select MIC";
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    micSelect.appendChild(placeholder);
+
+    devices.forEach((device) => {
+      if (device.kind === "audioinput") {
+        const micOption = document.createElement("option");
+        micOption.value = device.deviceId;
+        micOption.text = device.label;
+        micSelect.appendChild(micOption);
+      }
+    });
+  } catch (err) {
+    console.error("マイクの許可が取れませんでした: ", err);
+    micSelect.innerHTML = '<option value="">マイクが使用できません</option>';
+  }
+}
+
 recordBtn.onclick = () => {
   if (recorder.state === "inactive") {
     recorder.start();
@@ -150,6 +175,7 @@ canvas.addEventListener("mouseleave", () => {
 
 canvas.addEventListener("mousemove", (e) => {
   if (!isDragging) return;
+  if (!audioCtx) return;
 
   const rect = canvas.getBoundingClientRect();
   const x = e.clientX - rect.left;
@@ -219,4 +245,11 @@ function calcRms(analyser) {
 
 canvas.width = canvas.clientWidth;
 canvas.height = canvas.clientHeight;
+setupMicList();
+
+micSelect.addEventListener("change", async (e) => {
+  const selectedDeviceId = e.target.value;
+  await init(selectedDeviceId);
+});
+
 draw();

@@ -127,6 +127,7 @@ button:hover { background: var(--orange); transform: translateY(-1px); }
 button:active { transform: translateY(0); }
 
 #recordBtn {
+    width: 40px;
     height: auto; 
     background: #ffffff;
     color: var(--orange);
@@ -141,6 +142,23 @@ button:active { transform: translateY(0); }
 #recordBtn .icon {
     font-size: 17px;
     line-height: 1;
+}
+
+#micSelect{
+  width: 130px;
+  height: 40px;
+  padding: 10px 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 1rem;
+  cursor: pointer;
+  background: var(--orange);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  transition: background 0.18s, transform 0.08s;
+  box-shadow: 0 6px 14px rgba(255,159,95,0.12);
 }
 
 
