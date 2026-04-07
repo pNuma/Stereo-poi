@@ -1,6 +1,8 @@
 let audioCtx, source, analyser, gate, panner, stereoPanner, masterGain;
-let spaceX = 0,spaceZ = 0;
+let spaceX = 0,
+  spaceZ = 0;
 let isDragging = false;
+let iconX, iconZ;
 let threshold = 0.02;
 let destNode, recorder;
 let chunks = [];
@@ -12,7 +14,6 @@ const gateSlider = document.getElementById("gateSlider");
 const gainSlider = document.getElementById("gainSlider");
 const canvas = document.getElementById("visualizer");
 const ctx = canvas.getContext("2d");
-
 
 async function init(deviceId) {
   if (audioCtx) return;
@@ -30,7 +31,7 @@ async function init(deviceId) {
   spaceX = 1;
   spaceZ = 0;
 
-source = audioCtx.createMediaStreamSource(stream);
+  source = audioCtx.createMediaStreamSource(stream);
 
   analyser = audioCtx.createAnalyser();
   analyser.fftSize = 1024;
@@ -161,19 +162,27 @@ function updateGate() {
 }
 
 //マウス操作
-canvas.addEventListener("mousedown", () => {
-  isDragging = true;
+canvas.addEventListener("pointerdown", (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  iconX = ((spaceX + 5) / 10) * canvas.width;
+  iconZ = ((spaceZ + 5) / 10) * canvas.height;
+  const dist = Math.hypot(x - iconX, y - iconZ);
+  console.log(dist)
+  if (dist < 30) isDragging = true;
 });
 
-canvas.addEventListener("mouseup", () => {
+canvas.addEventListener("pointerup", () => {
   isDragging = false;
 });
 
-canvas.addEventListener("mouseleave", () => {
+canvas.addEventListener("pointerleave", () => {
   isDragging = false;
 });
 
-canvas.addEventListener("mousemove", (e) => {
+canvas.addEventListener("pointermove", (e) => {
   if (!isDragging) return;
   if (!audioCtx) return;
 

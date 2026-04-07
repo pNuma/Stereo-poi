@@ -1,4 +1,4 @@
-:root{
+:root {
   --blue: #7edcff;
   --orange: #ff9f5f;
   --soft-orange: #ffd4a8;
@@ -7,12 +7,14 @@
   --radius: 12px;
 }
 
-html, body {
+html,
+body {
   height: 100%;
 }
 body {
   margin: 0;
-  font-family: "Poppins", "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-family: "Poppins", "Nunito", system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial;
   color: var(--text);
   background: #ffffff;
   position: relative;
@@ -30,14 +32,13 @@ body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background:
-    repeating-linear-gradient(
-      45deg,
-      #e8f4ff 0,
-      #e8f4ff 10px,
-      #ffffff 10px,
-      #ffffff 20px
-    );
+  background: repeating-linear-gradient(
+    45deg,
+    #e8f4ff 0,
+    #e8f4ff 10px,
+    #ffffff 10px,
+    #ffffff 20px
+  );
   z-index: -99;
   opacity: 0.9;
 }
@@ -52,8 +53,8 @@ body::before {
   padding: 28px;
   box-sizing: border-box;
   border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(30,40,50,0.06);
-  border: 1px solid rgba(0,0,0,0.04);
+  box-shadow: 0 8px 24px rgba(30, 40, 50, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.04);
   overflow: auto;
   text-align: center;
 }
@@ -70,13 +71,13 @@ h1 {
 }
 
 .controls {
-  background: rgba(255,255,255,0.9);
+  background: rgba(255, 255, 255, 0.9);
   padding: 18px 22px;
   display: inline-block;
   border-radius: var(--radius);
   margin-top: 18px;
   border: 2px solid var(--soft-orange);
-  box-shadow: 0 6px 18px rgba(30,40,50,0.04);
+  box-shadow: 0 6px 18px rgba(30, 40, 50, 0.04);
   text-align: center;
 
   width: 85%;
@@ -110,7 +111,6 @@ input[type="range"] {
   gap: 10px;
 }
 
-
 button {
   height: 40px;
   padding: 10px 18px;
@@ -121,30 +121,35 @@ button {
   border: none;
   border-radius: 8px;
   transition: background 0.18s, transform 0.08s;
-  box-shadow: 0 6px 14px rgba(255,159,95,0.12);
+  box-shadow: 0 6px 14px rgba(255, 159, 95, 0.12);
 }
-button:hover { background: var(--orange); transform: translateY(-1px); }
-button:active { transform: translateY(0); }
+button:hover {
+  background: var(--orange);
+  transform: translateY(-1px);
+}
+button:active {
+  transform: translateY(0);
+}
 
 #recordBtn {
-    width: 40px;
-    height: auto; 
-    background: #ffffff;
-    color: var(--orange);
-    border-radius: var(--radius);
-    border: 2px solid var(--orange);
-    padding: 0px 8px;
-    cursor: pointer;
-    font-family: sans-serif;
-    font-size: 0;
+  width: 40px;
+  height: auto;
+  background: #ffffff;
+  color: var(--orange);
+  border-radius: var(--radius);
+  border: 2px solid var(--orange);
+  padding: 0px 8px;
+  cursor: pointer;
+  font-family: sans-serif;
+  font-size: 0;
 }
 
 #recordBtn .icon {
-    font-size: 17px;
-    line-height: 1;
+  font-size: 17px;
+  line-height: 1;
 }
 
-#micSelect{
+#micSelect {
   width: 130px;
   height: 40px;
   padding: 10px 18px;
@@ -158,9 +163,8 @@ button:active { transform: translateY(0); }
   border: none;
   border-radius: 8px;
   transition: background 0.18s, transform 0.08s;
-  box-shadow: 0 6px 14px rgba(255,159,95,0.12);
+  box-shadow: 0 6px 14px rgba(255, 159, 95, 0.12);
 }
-
 
 .val {
   color: var(--blue);
@@ -178,15 +182,17 @@ canvas {
   margin-left: auto;
   margin-right: auto;
   max-width: 100%;
+  aspect-ratio: 1 / 1;
 }
 
 small {
-  color: rgba(0,0,0,0.55);
+  color: rgba(0, 0, 0, 0.55);
   font-size: 0.82rem;
 }
 
-button:focus, input[type="range"]:focus {
-  outline: 3px solid rgba(126,220,255,0.18);
+button:focus,
+input[type="range"]:focus {
+  outline: 3px solid rgba(126, 220, 255, 0.18);
   outline-offset: 3px;
   border-radius: 8px;
 }
