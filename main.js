@@ -66,15 +66,17 @@ async function init(deviceId) {
 
   recorder.ondataavailable = (e) => chunks.push(e.data);
   recorder.onstop = () => {
-    const blob = new Blob(chunks, { type: "audio/webm" });
-    const url = URL.createObjectURL(blob);
+    if (confirm("録音が完了しました。音声データをダウンロードしますか？")) {
+      const blob = new Blob(chunks, { type: "audio/webm" });
+      const url = URL.createObjectURL(blob);
 
-    const downloadLink = document.createElement("a");
-    downloadLink.href = url;
-    downloadLink.download = "sonic_positioner_rec.webm";
-    downloadLink.click();
+      const downloadLink = document.createElement("a");
+      downloadLink.href = url;
+      downloadLink.download = "sonic_positioner_rec.webm";
+      downloadLink.click();
 
-    URL.revokeObjectURL(url);
+      URL.revokeObjectURL(url);
+    }
     chunks = [];
   };
 
@@ -113,12 +115,17 @@ async function setupMicList() {
       }
     });
   } catch (err) {
-    console.error("マイクの許可が取れませんでした: ", err);
+    console.error("マイクが許可されませんでした: ", err);
     micSelect.innerHTML = '<option value="">マイクが使用できません</option>';
   }
 }
 
 recordBtn.onclick = () => {
+  if (!audioCtx) {
+    alert("マイクを選択してください");
+    return;
+  }
+
   if (recorder.state === "inactive") {
     recorder.start();
     recordBtn.innerHTML = '<span class="icon">■</span>';
@@ -170,7 +177,6 @@ canvas.addEventListener("pointerdown", (e) => {
   iconX = ((spaceX + 5) / 10) * canvas.width;
   iconZ = ((spaceZ + 5) / 10) * canvas.height;
   const dist = Math.hypot(x - iconX, y - iconZ);
-  console.log(dist)
   if (dist < 30) isDragging = true;
 });
 
