@@ -59,15 +59,28 @@ body::before {
   text-align: center;
 }
 
-h1 {
+.logo-title {
   font-family: "Poppins", "Nunito", sans-serif;
-  font-size: 2.2rem;
+  font-size: 2rem;
   font-weight: 700;
-  margin: 0 0 18px 0;
+  margin: 0;
 
-  color: var(--blue);
-  text-shadow: 0 2px 0 var(--soft-orange);
+  color: var(--orange);
   letter-spacing: -0.5px;
+}
+
+.logo-title .small {
+  font-size: 0.5em;
+  font-weight: 700;
+}
+
+.logo-sub {
+  font-family: "Poppins", "Nunito", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--blue);
+  margin-top: 4px;
+  letter-spacing: 1px;
 }
 
 .controls {
