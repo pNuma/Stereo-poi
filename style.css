@@ -61,7 +61,7 @@ body::before {
 
 .logo-title {
   font-family: "Poppins", "Nunito", sans-serif;
-  font-size: 2rem;
+  font-size: 1.7rem;
   font-weight: 700;
   margin: 0;
 
@@ -70,13 +70,13 @@ body::before {
 }
 
 .logo-title .small {
-  font-size: 0.5em;
+  font-size: 0.8rem;
   font-weight: 700;
 }
 
 .logo-sub {
   font-family: "Poppins", "Nunito", sans-serif;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--blue);
   margin-top: 4px;
@@ -116,6 +116,11 @@ input[type="range"] {
   width: 100%;
   accent-color: var(--blue);
   height: 6px;
+}
+
+input[type="file"] {
+  width: 100%;
+  accent-color: var(--blue);
 }
 
 .buttons {

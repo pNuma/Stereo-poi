@@ -7,8 +7,11 @@ let threshold = 0.02;
 let destNode, recorder;
 let chunks = [];
 let analyserLeft, analyserRight;
+let file;
 
 const micSelect = document.getElementById("micSelect");
+const fileBtn = document.getElementById("fileBtn");
+const audioFileInput = document.getElementById("audioFileInput");
 const recordBtn = document.getElementById("recordBtn");
 const gateSlider = document.getElementById("gateSlider");
 const gainSlider = document.getElementById("gainSlider");
@@ -119,6 +122,32 @@ async function setupMicList() {
     micSelect.innerHTML = '<option value="">マイクが使用できません</option>';
   }
 }
+
+fileBtn.onclick = () => {
+      if (!audioCtx) return;
+ audioFileInput.click();
+};
+
+audioFileInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  console.log("読み込んだファイル:", file.name);
+  const fileUrl = URL.createObjectURL(file);
+  
+  const audioEl = new Audio(fileUrl);
+  audioEl.loop = true;
+  const loadSource = audioCtx.createMediaElementSource(audioEl);
+
+  if (source) source.disconnect();
+
+  loadSource.connect(analyser);
+  loadSource.connect(gate);
+
+  audioEl.play();
+  
+  source = loadSource; 
+});
 
 recordBtn.onclick = () => {
   if (!audioCtx) {
