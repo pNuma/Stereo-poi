@@ -112,6 +112,24 @@ label {
   font-weight: 600;
 }
 
+.label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.label-row label {
+    font-weight: 600;
+}
+
+.val {
+    font-family: monospace;
+    min-width: 50px;
+    text-align: right;
+}
+
+
 input[type="range"] {
   width: 100%;
   accent-color: var(--blue);
