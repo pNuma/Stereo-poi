@@ -18,6 +18,15 @@ const gainSlider = document.getElementById("gainSlider");
 const canvas = document.getElementById("visualizer");
 const ctx = canvas.getContext("2d");
 
+function formatTime(seconds) {
+  if (isNaN(seconds)) return "0:00";
+  const min = Math.floor(seconds / 60);
+  const sec = Math.floor(seconds % 60)
+    .toString()
+    .padStart(2, "0");
+  return `${min}:${sec}`;
+}
+
 async function init(deviceId) {
   if (audioCtx) return;
   audioCtx = new AudioContext({ latencyHint: "interactive" });
@@ -124,8 +133,8 @@ async function setupMicList() {
 }
 
 fileBtn.onclick = () => {
-      if (!audioCtx) return;
- audioFileInput.click();
+  if (!audioCtx) return;
+  audioFileInput.click();
 };
 
 audioFileInput.addEventListener("change", (e) => {
@@ -134,9 +143,20 @@ audioFileInput.addEventListener("change", (e) => {
 
   console.log("読み込んだファイル:", file.name);
   const fileUrl = URL.createObjectURL(file);
-  
+
   const audioEl = new Audio(fileUrl);
   audioEl.loop = true;
+
+  const timeDisplay = document.getElementById("timeDisplay");
+  audioEl.addEventListener("loadedmetadata", () => {
+    timeDisplay.innerText = `0:00 / ${formatTime(audioEl.duration)}`;
+  });
+  audioEl.addEventListener("timeupdate", () => {
+    const current = formatTime(audioEl.currentTime);
+    const total = formatTime(audioEl.duration);
+    timeDisplay.innerText = `${current} / ${total}`;
+  });
+
   const loadSource = audioCtx.createMediaElementSource(audioEl);
 
   if (source) source.disconnect();
@@ -145,8 +165,8 @@ audioFileInput.addEventListener("change", (e) => {
   loadSource.connect(gate);
 
   audioEl.play();
-  
-  source = loadSource; 
+
+  source = loadSource;
 });
 
 recordBtn.onclick = () => {
