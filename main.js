@@ -266,11 +266,15 @@ function draw() {
   // 方向表示
   ctx.fillStyle = "rgb(177, 177, 177)";
   ctx.font = "16px sans-serif";
-  ctx.fillText("Front", canvas.width / 2 - 20, 30);
-  ctx.fillText("Rear", canvas.width / 2 - 20, canvas.height - 20);
+
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  ctx.fillText("Front", canvas.width / 2, 30);
+  ctx.fillText("Rear", canvas.width / 2, canvas.height - 20);
 
   ctx.fillText("Left", 20, canvas.height / 2);
-  ctx.fillText("Right", canvas.width - 60, canvas.height / 2);
+  ctx.fillText("Right", canvas.width - 30, canvas.height / 2);
 
   // リスナー（自分）を中央に描画
   ctx.font = '40px "Noto Sans Symbols 2", sans-serif';
@@ -289,8 +293,8 @@ function draw() {
 
   ctx.fillStyle = "#7edcff";
   ctx.font = "14px monospace";
-  ctx.fillText(`L: ${leftRms.toFixed(1)}`, canvas.width - 80, 30);
-  ctx.fillText(`R: ${rightRms.toFixed(1)}`, canvas.width - 80, 50);
+  ctx.fillText(`L: ${leftRms.toFixed(1)}`, canvas.width - 50, 30);
+  ctx.fillText(`R: ${rightRms.toFixed(1)}`, canvas.width - 50, 50);
 
   requestAnimationFrame(draw);
 }

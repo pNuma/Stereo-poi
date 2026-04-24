@@ -202,6 +202,12 @@ button:active {
   box-shadow: 0 6px 14px rgba(255, 159, 95, 0.12);
 }
 
+#timeDisplay{
+   margin-left: 15px;
+   font-family: monospace;
+    color: #ccc;
+}
+
 .val {
   color: var(--blue);
   font-weight: 700;
