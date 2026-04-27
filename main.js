@@ -7,10 +7,12 @@ let threshold = 0.02;
 let destNode, recorder;
 let chunks = [];
 let analyserLeft, analyserRight;
-let file;
+let file, audioEl;
+let isPausing = true;
 
 const micSelect = document.getElementById("micSelect");
 const fileBtn = document.getElementById("fileBtn");
+const pauseBtn = document.getElementById("pauseBtn");
 const audioFileInput = document.getElementById("audioFileInput");
 const recordBtn = document.getElementById("recordBtn");
 const gateSlider = document.getElementById("gateSlider");
@@ -132,19 +134,52 @@ async function setupMicList() {
   }
 }
 
+micSelect.addEventListener("change", async (e) => {
+  const selectedDeviceId = e.target.value;
+  await init(selectedDeviceId);
+});
+
 fileBtn.onclick = () => {
-  if (!audioCtx) return;
+  if (!audioCtx) {
+    alert("マイクを選択してください");
+    return;
+  }
   audioFileInput.click();
+};
+
+pauseBtn.onclick = () => {
+  if (recorder.state === "recording") {
+    recorder.pause();
+    pauseBtn.innerHTML = '<span class="icon">▶</span>';
+    audioEl.pause();
+  } else if (recorder.state === "paused") {
+    recorder.resume();
+    pauseBtn.innerHTML = '<span class="icon">⏸</span>';
+    audioEl.play();
+  }
+};
+
+recordBtn.onclick = () => {
+  if (!audioCtx) {
+    alert("マイクを選択してください");
+    return;
+  }
+
+  if (recorder.state === "inactive") {
+    recorder.start();
+    recordBtn.innerHTML = '<span class="icon">■</span>';
+  } else {
+    recorder.stop();
+    recordBtn.innerHTML = '<span class="icon">●</span>';
+  }
 };
 
 audioFileInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) return;
-
-  console.log("読み込んだファイル:", file.name);
   const fileUrl = URL.createObjectURL(file);
 
-  const audioEl = new Audio(fileUrl);
+  audioEl = new Audio(fileUrl);
   audioEl.loop = true;
 
   const timeDisplay = document.getElementById("timeDisplay");
@@ -164,25 +199,10 @@ audioFileInput.addEventListener("change", (e) => {
   loadSource.connect(analyser);
   loadSource.connect(gate);
 
-  audioEl.play();
+  audioEl.pause();
 
   source = loadSource;
 });
-
-recordBtn.onclick = () => {
-  if (!audioCtx) {
-    alert("マイクを選択してください");
-    return;
-  }
-
-  if (recorder.state === "inactive") {
-    recorder.start();
-    recordBtn.innerHTML = '<span class="icon">■</span>';
-  } else {
-    recorder.stop();
-    recordBtn.innerHTML = '<span class="icon">●</span>';
-  }
-};
 
 // スライダー操作
 gateSlider.addEventListener("input", (e) => {
@@ -314,10 +334,5 @@ function calcRms(analyser) {
 canvas.width = canvas.clientWidth;
 canvas.height = canvas.clientHeight;
 setupMicList();
-
-micSelect.addEventListener("change", async (e) => {
-  const selectedDeviceId = e.target.value;
-  await init(selectedDeviceId);
-});
 
 draw();

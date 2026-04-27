@@ -147,7 +147,7 @@ input[type="file"] {
   gap: 10px;
 }
 
-button {
+#fileBtn {
   height: 40px;
   padding: 10px 18px;
   font-size: 1rem;
@@ -159,15 +159,8 @@ button {
   transition: background 0.18s, transform 0.08s;
   box-shadow: 0 6px 14px rgba(255, 159, 95, 0.12);
 }
-button:hover {
-  background: var(--orange);
-  transform: translateY(-1px);
-}
-button:active {
-  transform: translateY(0);
-}
 
-#recordBtn {
+.btn {
   width: 40px;
   height: auto;
   background: #ffffff;
@@ -180,7 +173,7 @@ button:active {
   font-size: 0;
 }
 
-#recordBtn .icon {
+.btn .icon {
   font-size: 17px;
   line-height: 1;
 }
