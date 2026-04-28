@@ -30,81 +30,90 @@ function formatTime(seconds) {
 }
 
 async function init(deviceId) {
-  if (audioCtx) return;
-  audioCtx = new AudioContext({ latencyHint: "interactive" });
+  if (!audioCtx) {
+    audioCtx = new AudioContext({ latencyHint: "interactive" });
 
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: {
-      deviceId: { exact: deviceId },
-      echoCancellation: false,
-      noiseSuppression: false,
-      autoGainControl: false,
-    },
-  });
+    spaceX = 1;
+    spaceZ = 0;
 
-  spaceX = 1;
-  spaceZ = 0;
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 1024;
 
-  source = audioCtx.createMediaStreamSource(stream);
+    gate = audioCtx.createGain();
+    masterGain = audioCtx.createGain();
 
-  analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 1024;
+    panner = new PannerNode(audioCtx, {
+      panningModel: "HRTF",
+      distanceModel: "inverse",
+      rolloffFactor: 2,
+      refDistance: 1,
+      positionX: spaceX,
+      positionY: 0,
+      positionZ: spaceZ,
+    });
 
-  gate = audioCtx.createGain();
-  masterGain = audioCtx.createGain();
+    stereoPanner = audioCtx.createStereoPanner();
 
-  panner = new PannerNode(audioCtx, {
-    panningModel: "HRTF",
-    distanceModel: "inverse",
-    rolloffFactor: 2,
-    refDistance: 1,
-    positionX: spaceX,
-    positionY: 0,
-    positionZ: spaceZ,
-  });
+    gate.connect(panner);
+    panner.connect(stereoPanner);
+    stereoPanner.connect(masterGain);
+    masterGain.connect(audioCtx.destination);
 
-  stereoPanner = audioCtx.createStereoPanner();
+    //録音用
+    dest = audioCtx.createMediaStreamDestination();
+    masterGain.connect(dest);
+    recorder = new MediaRecorder(dest.stream);
 
-  source.connect(analyser);
-  source.connect(gate);
+    recorder.ondataavailable = (e) => chunks.push(e.data);
+    recorder.onstop = () => {
+      if (confirm("録音が完了しました。音声データをダウンロードしますか？")) {
+        const blob = new Blob(chunks, { type: "audio/webm" });
+        const url = URL.createObjectURL(blob);
 
-  gate.connect(panner);
-  panner.connect(stereoPanner);
-  stereoPanner.connect(masterGain);
-  masterGain.connect(audioCtx.destination);
+        const downloadLink = document.createElement("a");
+        downloadLink.href = url;
+        downloadLink.download = "sonic_positioner_rec.webm";
+        downloadLink.click();
 
-  //録音用
-  dest = audioCtx.createMediaStreamDestination();
-  masterGain.connect(dest);
-  recorder = new MediaRecorder(dest.stream);
+        URL.revokeObjectURL(url);
+      }
+      chunks = [];
+    };
 
-  recorder.ondataavailable = (e) => chunks.push(e.data);
-  recorder.onstop = () => {
-    if (confirm("録音が完了しました。音声データをダウンロードしますか？")) {
-      const blob = new Blob(chunks, { type: "audio/webm" });
-      const url = URL.createObjectURL(blob);
+    //左右の音量確認用
+    const splitter = audioCtx.createChannelSplitter(2);
+    analyserLeft = audioCtx.createAnalyser();
+    analyserRight = audioCtx.createAnalyser();
+    analyserLeft.fftSize = 2048;
+    analyserRight.fftSize = 2048;
+    masterGain.connect(splitter);
+    splitter.connect(analyserLeft, 0);
+    splitter.connect(analyserRight, 1);
 
-      const downloadLink = document.createElement("a");
-      downloadLink.href = url;
-      downloadLink.download = "sonic_positioner_rec.webm";
-      downloadLink.click();
+    updateGate();
+  }
 
-      URL.revokeObjectURL(url);
-    }
-    chunks = [];
-  };
+  if (source) {
+    source.disconnect();
+  }
 
-  //左右の音量確認用
-  const splitter = audioCtx.createChannelSplitter(2);
-  analyserLeft = audioCtx.createAnalyser();
-  analyserRight = audioCtx.createAnalyser();
-  analyserLeft.fftSize = 2048;
-  analyserRight.fftSize = 2048;
-  masterGain.connect(splitter);
-  splitter.connect(analyserLeft, 0);
-  splitter.connect(analyserRight, 1);
+  if (deviceId === "no-mic") {
+    //pass
+  } else {
+    console.log("エラーが起きる直前の deviceId の中身:", deviceId);
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        deviceId: { exact: deviceId },
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false,
+      },
+    });
 
-  updateGate();
+    source = audioCtx.createMediaStreamSource(stream);
+    source.connect(analyser);
+    source.connect(gate);
+  }
 }
 
 async function setupMicList() {
@@ -130,7 +139,7 @@ async function setupMicList() {
     });
   } catch (err) {
     console.error("マイクが許可されませんでした: ", err);
-    micSelect.innerHTML = '<option value="">マイクが使用できません</option>';
+    // micSelect.innerHTML = '<option value="">マイクが使用できません</option>';
   }
 }
 
@@ -140,10 +149,10 @@ micSelect.addEventListener("change", async (e) => {
 });
 
 fileBtn.onclick = () => {
-  if (!audioCtx) {
-    alert("マイクを選択してください");
-    return;
-  }
+  // if (!audioCtx) {
+  //   alert("マイクを選択してください");
+  //   return;
+  // }
   audioFileInput.click();
 };
 
@@ -174,9 +183,15 @@ recordBtn.onclick = () => {
   }
 };
 
-audioFileInput.addEventListener("change", (e) => {
+audioFileInput.addEventListener("change", async (e) => {
   const file = e.target.files[0];
   if (!file) return;
+
+  if (!audioCtx) {
+    await init("no-mic");
+    micSelect.value = "no-mic";
+  }
+
   const fileUrl = URL.createObjectURL(file);
 
   audioEl = new Audio(fileUrl);
