@@ -97,6 +97,13 @@ async function init(deviceId) {
     source.disconnect();
   }
 
+  if (audioEl) {
+    audioEl.pause();
+    
+    const pauseBtn = document.getElementById("pauseBtn");
+    if (pauseBtn) pauseBtn.innerHTML = '<span class="icon">▶</span>';
+  }
+
   if (deviceId === "no-mic") {
     //pass
   } else {
