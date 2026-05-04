@@ -186,7 +186,9 @@ recordBtn.onclick = () => {
     recordBtn.innerHTML = '<span class="icon">■</span>';
   } else {
     recorder.stop();
+    audioEl.pause();
     recordBtn.innerHTML = '<span class="icon">●</span>';
+    pauseBtn.innerHTML = '<span class="icon">▶</span>';
   }
 };
 
