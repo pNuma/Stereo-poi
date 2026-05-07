@@ -1,233 +1,231 @@
 :root {
-  --blue: #7edcff;
-  --orange: #ff9f5f;
-  --soft-orange: #ffd4a8;
-  --card-bg: #fffef6;
-  --text: #333333;
-  --radius: 12px;
+  --bg-body: #2b2b2b;
+  --bg-panel: #f4f4f4;
+  --bg-module: #e0e0e0;
+  --text-main: #222222;
+  --text-muted: #666666;
+  --border: #bcbcbc;
+  
+  --accent-orange: #ff5e00;
+  --accent-blue: #007acc;
+  --radius: 2px;
+
+    --left-stack-width: 180px;
+  --right-stack-width: 132px;
 }
 
-html,
-body {
+html, body {
   height: 100%;
-}
-body {
   margin: 0;
-  font-family: "Poppins", "Nunito", system-ui, -apple-system, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial;
-  color: var(--text);
-  background: #ffffff;
-  position: relative;
-  overflow-x: hidden;
-
+  background: var(--bg-body);
+  font-family: "Noto Sans Symbols 2", "Helvetica Neue", Arial, sans-serif;
+  color: var(--text-main);
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100dvh;
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: repeating-linear-gradient(
-    45deg,
-    #e8f4ff 0,
-    #e8f4ff 10px,
-    #ffffff 10px,
-    #ffffff 20px
-  );
-  z-index: -99;
-  opacity: 0.9;
 }
 
 .content {
-  background: var(--card-bg);
-  position: relative;
-  z-index: 2;
-
-  width: auto;
-  max-height: 90dvh;
-  padding: 28px;
+  background: var(--bg-panel);
+  width: 95%;
+  max-width: 600px;
+  padding: 20px;
   box-sizing: border-box;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(30, 40, 50, 0.06);
-  border: 1px solid rgba(0, 0, 0, 0.04);
-  overflow: auto;
-  text-align: center;
+  border-radius: var(--radius);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border-top: 4px solid var(--accent-orange);
 }
 
+/* ロゴタイトル */
 .logo-title {
-  font-family: "Poppins", "Nunito", sans-serif;
-  font-size: 1.7rem;
-  font-weight: 700;
-  margin: 0;
-
-  color: var(--orange);
-  letter-spacing: -0.5px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0 0 15px 0;
+  color: var(--text-main);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: baseline;
 }
 
 .logo-title .small {
   font-size: 0.8rem;
-  font-weight: 700;
-}
-
-.logo-sub {
-  font-family: "Poppins", "Nunito", sans-serif;
-  font-size: 0.8rem;
+  color: var(--text-muted);
   font-weight: 600;
-  color: var(--blue);
-  margin-top: 4px;
   letter-spacing: 1px;
+  margin-left: 15px;
 }
 
-.controls {
-  background: rgba(255, 255, 255, 0.9);
-  padding: 18px 22px;
-  display: inline-block;
-  border-radius: var(--radius);
-  margin-top: 18px;
-  border: 2px solid var(--soft-orange);
-  box-shadow: 0 6px 18px rgba(30, 40, 50, 0.04);
-  text-align: center;
+/* -------------------------------------
+   コントロールパネル
+-------------------------------------- */
+.control-panel {
+  display: grid;
+  grid-template-columns: var(--left-stack-width) var(--right-stack-width);
+  justify-content: center;
+  align-items: start;
+  column-gap: clamp(0px, 1vw, 12px);
 
-  width: 85%;
+  background: var(--bg-module);
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 15px;
+}
+
+.input-section {
+  display: grid;
+  gap: 8px;
+}
+
+.action-section {
+  display: grid;
+  gap: 8px;
+  justify-items: stretch;
+}
+
+#micSelect,
+#fileBtn {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#buttons.status,
+#timeDisplay {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#buttons.status {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+#buttons.status .btn-rect {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+}
+
+#timeDisplay {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  text-align: center;
+  font-family: monospace;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+  background: #f7f7f7;
+  padding: 6px 0;
+  border: 1px solid var(--border);
+  box-shadow: inset 1px 1px 0 rgba(255,255,255,0.7);
+  white-space: nowrap;
+}
+
+select,
+#fileBtn {
+  width: 100%;
+  max-width: 140px;
+  text-overflow: ellipsis;
+}
+
+.btn-rect, select {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  background: #ffffff;
+  color: var(--text-main);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 1px 1px 0px rgba(0,0,0,0.1);
+  transition: all 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-rect:active, select:active {
+  transform: translateY(1px);
+  box-shadow: none;
+  background: #f0f0f0;
+}
+
+.icon-btn {
+  padding: 0 10px;
+  font-size: 1rem;
+}
+
+.rec-btn {
+  color: #d92020;
+}
+
+/* -------------------------------------
+   スライダー群
+-------------------------------------- */
+.sliders-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px 20px;
+  background: var(--bg-module);
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 15px;
 }
 
 .slider-group {
-  margin: 12px 0;
-  text-align: left;
-  max-width: 420px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-label {
-  display: block;
-  margin-bottom: 6px;
-  color: var(--orange);
-  font-size: 0.85rem;
-  font-weight: 600;
+  margin: 0;
 }
 
 .label-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 4px;
 }
 
 .label-row label {
-    font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin: 0;
 }
 
 .val {
-    font-family: monospace;
-    min-width: 50px;
-    text-align: right;
+  font-family: monospace;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: var(--accent-blue);
 }
-
 
 input[type="range"] {
   width: 100%;
-  accent-color: var(--blue);
-  height: 6px;
+  height: 4px;
+  accent-color: var(--accent-orange);
+  cursor: ew-resize;
 }
 
-input[type="file"] {
-  width: 100%;
-  accent-color: var(--blue);
-}
-
-.buttons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-#fileBtn {
-  height: 40px;
-  padding: 10px 18px;
-  font-size: 1rem;
-  cursor: pointer;
-  background: var(--orange);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  transition: background 0.18s, transform 0.08s;
-  box-shadow: 0 6px 14px rgba(255, 159, 95, 0.12);
-}
-
-.btn {
-  width: 40px;
-  height: auto;
+/* -------------------------------------
+   キャンバス
+-------------------------------------- */
+#visualizer {
   background: #ffffff;
-  color: var(--orange);
-  border-radius: var(--radius);
-  border: 2px solid var(--orange);
-  padding: 0px 8px;
-  cursor: pointer;
-  font-family: sans-serif;
-  font-size: 0;
-}
-
-.btn .icon {
-  font-size: 17px;
-  line-height: 1;
-}
-
-#micSelect {
-  width: 130px;
-  height: 40px;
-  padding: 10px 18px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 1rem;
-  cursor: pointer;
-  background: var(--orange);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  transition: background 0.18s, transform 0.08s;
-  box-shadow: 0 6px 14px rgba(255, 159, 95, 0.12);
-}
-
-#timeDisplay{
-   margin-left: 15px;
-   font-family: monospace;
-    color: #ccc;
-}
-
-.val {
-  color: var(--blue);
-  font-weight: 700;
-  margin-left: 10px;
-}
-
-canvas {
-  background: #ffffff;
-  border: 2px solid var(--soft-orange);
+  border: 1px solid var(--border);
   cursor: crosshair;
-  margin-top: 14px;
-  border-radius: 10px;
+  border-radius: var(--radius);
   display: block;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 100%;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 400px;
   aspect-ratio: 1 / 1;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
 }
 
-small {
-  color: rgba(0, 0, 0, 0.55);
-  font-size: 0.82rem;
-}
-
-button:focus,
-input[type="range"]:focus {
-  outline: 3px solid rgba(126, 220, 255, 0.18);
-  outline-offset: 3px;
-  border-radius: 8px;
+button:focus, select:focus, input[type="range"]:focus {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 1px;
 }
