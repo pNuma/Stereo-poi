@@ -211,7 +211,10 @@ recordBtn.onclick = () => {
 
   if (recorder.state === "inactive") {
     recorder.start();
-    recordBtn.innerHTML = '<span class="icon">■</span>';
+    recordBtn.innerHTML = '■';
+    pauseBtn.innerHTML = '⏸';
+
+    if (audioEl) audioEl.play();
   } else {
     recorder.stop();
     if (audioEl) audioEl.pause();
