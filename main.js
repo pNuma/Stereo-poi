@@ -1,14 +1,30 @@
-let audioCtx, source, analyser, gate, panner, stereoPanner, masterGain;
+// Web Audio API関連ノード
+let audioCtx,
+  source,
+  analyser,
+  gate,
+  panner,
+  stereoPanner,
+  masterGain,
+  destNode,
+  recorder,
+  analyserLeft,
+  analyserRight,
+  audioEl;
+
+// ファイル
+let chunks = [],
+  file;
+
+//パラメータ
 let spaceX = 0,
-  spaceZ = 0;
-let isDragging = false;
-let iconX, iconZ;
-let threshold = 0.02;
-let destNode, recorder;
-let chunks = [];
-let analyserLeft, analyserRight;
-let file, audioEl;
-let isPausing = true;
+  spaceZ = 0,
+  iconX,
+  iconZ,
+  threshold = 0.0,
+  volume = 1.0,
+  isDragging = false,
+  isPausing = true;
 
 const micSelect = document.getElementById("micSelect");
 const fileBtn = document.getElementById("fileBtn");
@@ -19,7 +35,7 @@ const recordBtn = document.getElementById("recordBtn");
 const gateSlider = document.getElementById("gateSlider");
 const gainSlider = document.getElementById("gainSlider");
 const canvas = document.getElementById("visualizer");
-const ctx = canvas.getContext("2d");
+const ctx = canvas ? canvas.getContext("2d") : null;
 
 function formatTime(seconds) {
   if (isNaN(seconds)) return "0:00";
@@ -61,9 +77,9 @@ async function init(deviceId) {
     masterGain.connect(audioCtx.destination);
 
     //録音用
-    dest = audioCtx.createMediaStreamDestination();
-    masterGain.connect(dest);
-    recorder = new MediaRecorder(dest.stream);
+    destNode = audioCtx.createMediaStreamDestination();
+    masterGain.connect(destNode);
+    recorder = new MediaRecorder(destNode.stream);
 
     recorder.ondataavailable = (e) => chunks.push(e.data);
     recorder.onstop = () => {
@@ -100,9 +116,9 @@ async function init(deviceId) {
 
   if (audioEl) {
     audioEl.pause();
-    
+
     const pauseBtn = document.getElementById("pauseBtn");
-    if (pauseBtn) pauseBtn.innerHTML = '<span class="icon">▶</span>';
+    pauseBtn.innerHTML = '<span class="icon">▶</span>';
   }
 
   if (deviceId === "no-mic") {
@@ -129,6 +145,7 @@ async function setupMicList() {
     await navigator.mediaDevices.getUserMedia({ audio: true });
     const devices = await navigator.mediaDevices.enumerateDevices();
 
+    if (!micSelect) return;
     micSelect.innerHTML = "";
 
     const placeholder = document.createElement("option");
@@ -136,6 +153,11 @@ async function setupMicList() {
     placeholder.disabled = true;
     placeholder.selected = true;
     micSelect.appendChild(placeholder);
+
+    const noMicOption = document.createElement("option");
+    noMicOption.value = "no-mic";
+    noMicOption.textContent = "マイクなし";
+    micSelect.appendChild(noMicOption);
 
     devices.forEach((device) => {
       if (device.kind === "audioinput") {
@@ -147,7 +169,6 @@ async function setupMicList() {
     });
   } catch (err) {
     console.error("マイクが許可されませんでした: ", err);
-    // micSelect.innerHTML = '<option value="">マイクが使用できません</option>';
   }
 }
 
@@ -157,48 +178,52 @@ micSelect.addEventListener("change", async (e) => {
 });
 
 fileBtn.onclick = () => {
-  // if (!audioCtx) {
-  //   alert("マイクを選択してください");
-  //   return;
-  // }
   audioFileInput.click();
 };
 
 pauseBtn.onclick = () => {
+  if (!recorder) return;
+
   if (recorder.state === "recording") {
     recorder.pause();
     pauseBtn.innerHTML = '<span class="icon">▶</span>';
-    audioEl.pause();
+    if (audioEl) audioEl.pause();
   } else if (recorder.state === "paused") {
     recorder.resume();
     pauseBtn.innerHTML = '<span class="icon">⏸</span>';
-    audioEl.play();
+    if (audioEl) {
+      const playPromise = audioEl.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.warn("audioEl.play() failed:", err);
+        });
+      }
+    }
   }
 };
-
 
 recordBtn.onclick = () => {
   if (!audioCtx) {
     alert("マイクを選択してください");
     return;
   }
+  if (!recorder) return;
 
   if (recorder.state === "inactive") {
     recorder.start();
     recordBtn.innerHTML = '<span class="icon">■</span>';
   } else {
     recorder.stop();
-    audioEl.pause();
+    if (audioEl) audioEl.pause();
     recordBtn.innerHTML = '<span class="icon">●</span>';
     pauseBtn.innerHTML = '<span class="icon">▶</span>';
   }
 };
 
 resetBtn.onclick = () => {
-  // ファイルの再生停止と選択解除
   if (audioEl) {
     audioEl.pause();
-    audioEl.currentTime = 0;
+    // audioEl.currentTime = 0;
     audioEl = null;
   }
   audioFileInput.value = "";
@@ -212,17 +237,13 @@ resetBtn.onclick = () => {
   // UIのリセット
   recordBtn.innerHTML = '<span class="icon">●</span>';
   pauseBtn.innerHTML = '<span class="icon">▶</span>';
-  document.getElementById("timeDisplay").innerText = "0:00 / 0:00";
+  const timeDisplay = document.getElementById("timeDisplay");
+  timeDisplay.innerText = "0:00 / 0:00";
   micSelect.value = "";
 
   if (source) {
     source.disconnect();
     source = null;
-  }
-
-  if (audioEl) {
-    audioEl.getTracks().forEach((track) => track.stop());
-    audioEl = null;
   }
 };
 
@@ -232,10 +253,17 @@ audioFileInput.addEventListener("change", async (e) => {
 
   if (!audioCtx) {
     await init("no-mic");
-    micSelect.value = "no-mic";
+
+    const noMicOption = micSelect.querySelector('option[value="no-mic"]');
+    if (noMicOption) micSelect.value = "no-mic";
   }
 
   const fileUrl = URL.createObjectURL(file);
+
+  if (audioEl) {
+    audioEl.pause();
+    audioEl.src = "";
+  }
 
   audioEl = new Audio(fileUrl);
   audioEl.loop = true;
@@ -245,10 +273,22 @@ audioFileInput.addEventListener("change", async (e) => {
     timeDisplay.innerText = `0:00 / ${formatTime(audioEl.duration)}`;
   });
   audioEl.addEventListener("timeupdate", () => {
+    if (!audioEl) return;
     const current = formatTime(audioEl.currentTime);
     const total = formatTime(audioEl.duration);
     timeDisplay.innerText = `${current} / ${total}`;
   });
+  audioEl.addEventListener("error", (err) => {
+    console.error("audioEl load error:", err);
+  });
+
+  if (audioCtx.state === "suspended") {
+    try {
+      await audioCtx.resume();
+    } catch (err) {
+      console.warn("audioCtx.resume() failed:", err);
+    }
+  }
 
   const loadSource = audioCtx.createMediaElementSource(audioEl);
 
@@ -265,14 +305,16 @@ audioFileInput.addEventListener("change", async (e) => {
 // スライダー操作
 gateSlider.addEventListener("input", (e) => {
   const val = parseFloat(e.target.value);
-  document.getElementById("gateVal").innerText = val.toFixed(3);
+  const gateValEl = document.getElementById("gateVal");
+  gateValEl.innerText = val.toFixed(3);
 
   threshold = val;
 });
 
 gainSlider.addEventListener("input", (e) => {
   const val = parseFloat(e.target.value);
-  document.getElementById("gainVal").innerText = val.toFixed(2);
+  const gainValEl = document.getElementById("gainVal");
+  gainValEl.innerText = val.toFixed(2);
 
   if (masterGain) {
     masterGain.gain.setTargetAtTime(val, audioCtx.currentTime, 0.05);
@@ -281,6 +323,9 @@ gainSlider.addEventListener("input", (e) => {
 
 function updateGate() {
   requestAnimationFrame(updateGate);
+
+  // audioCtxまたは各ノードが未初期化の場合はスキップ
+  if (!audioCtx || !analyser || !gate) return;
 
   const data = new Float32Array(analyser.fftSize);
   analyser.getFloatTimeDomainData(data);
@@ -296,6 +341,7 @@ function updateGate() {
 }
 
 //マウス操作
+
 canvas.addEventListener("pointerdown", (e) => {
   const rect = canvas.getBoundingClientRect();
   const x = e.clientX - rect.left;
@@ -339,6 +385,11 @@ canvas.addEventListener("pointermove", (e) => {
 
 //キャンバスの描画
 function draw() {
+  if (!canvas || !ctx) {
+    requestAnimationFrame(draw);
+    return;
+  }
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // 方向表示
@@ -356,7 +407,7 @@ function draw() {
 
   // リスナー（自分）を中央に描画
   ctx.font = '40px "Noto Sans Symbols 2", sans-serif';
-  ctx.fillStyle = "#ff9f5f";
+  ctx.fillStyle = "#ff5e00";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText("🎙", canvas.width / 2, canvas.height / 2);
@@ -369,7 +420,7 @@ function draw() {
   const leftRms = calcRms(analyserLeft);
   const rightRms = calcRms(analyserRight);
 
-  ctx.fillStyle = "#7edcff";
+  ctx.fillStyle = "#007acc";
   ctx.font = "14px monospace";
   ctx.fillText(`L: ${leftRms.toFixed(1)}`, canvas.width - 50, 30);
   ctx.fillText(`R: ${rightRms.toFixed(1)}`, canvas.width - 50, 50);
@@ -389,24 +440,20 @@ function calcRms(analyser) {
   return Math.sqrt(sum / data.length);
 }
 
-
 window.addEventListener("DOMContentLoaded", () => {
   const gateSlider = document.getElementById("gateSlider");
   const gainSlider = document.getElementById("gainSlider");
-
   if (gateSlider) {
-    gateSlider.value = 0.01;
+    gateSlider.value = threshold;
     gateSlider.dispatchEvent(new Event("input"));
   }
   if (gainSlider) {
-    gainSlider.value = 0.8;
+    gainSlider.value = volume;
     gainSlider.dispatchEvent(new Event("input"));
   }
-
   canvas.width = canvas.clientWidth;
-canvas.height = canvas.clientHeight;
-setupMicList();
+  canvas.height = canvas.clientHeight;
 
-draw();
-
+  setupMicList();
+  draw();
 });
