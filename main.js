@@ -13,6 +13,7 @@ let isPausing = true;
 const micSelect = document.getElementById("micSelect");
 const fileBtn = document.getElementById("fileBtn");
 const pauseBtn = document.getElementById("pauseBtn");
+const resetBtn = document.getElementById("resetBtn");
 const audioFileInput = document.getElementById("audioFileInput");
 const recordBtn = document.getElementById("recordBtn");
 const gateSlider = document.getElementById("gateSlider");
@@ -67,12 +68,12 @@ async function init(deviceId) {
     recorder.ondataavailable = (e) => chunks.push(e.data);
     recorder.onstop = () => {
       if (confirm("録音が完了しました。音声データをダウンロードしますか？")) {
-        const blob = new Blob(chunks, { type: "audio/webm" });
+        const blob = new Blob(chunks, { type: "audio/wav" });
         const url = URL.createObjectURL(blob);
 
         const downloadLink = document.createElement("a");
         downloadLink.href = url;
-        downloadLink.download = "sonic_positioner_rec.webm";
+        downloadLink.download = "stereopoi_rec.wav";
         downloadLink.click();
 
         URL.revokeObjectURL(url);
@@ -175,6 +176,7 @@ pauseBtn.onclick = () => {
   }
 };
 
+
 recordBtn.onclick = () => {
   if (!audioCtx) {
     alert("マイクを選択してください");
@@ -189,6 +191,38 @@ recordBtn.onclick = () => {
     audioEl.pause();
     recordBtn.innerHTML = '<span class="icon">●</span>';
     pauseBtn.innerHTML = '<span class="icon">▶</span>';
+  }
+};
+
+resetBtn.onclick = () => {
+  // ファイルの再生停止と選択解除
+  if (audioEl) {
+    audioEl.pause();
+    audioEl.currentTime = 0;
+    audioEl = null;
+  }
+  audioFileInput.value = "";
+
+  // 録音データの破棄
+  if (recorder && recorder.state !== "inactive") {
+    recorder.stop();
+  }
+  chunks = [];
+
+  // UIのリセット
+  recordBtn.innerHTML = '<span class="icon">●</span>';
+  pauseBtn.innerHTML = '<span class="icon">▶</span>';
+  document.getElementById("timeDisplay").innerText = "0:00 / 0:00";
+  micSelect.value = "";
+
+  if (source) {
+    source.disconnect();
+    source = null;
+  }
+
+  if (audioEl) {
+    audioEl.getTracks().forEach((track) => track.stop());
+    audioEl = null;
   }
 };
 
@@ -355,8 +389,24 @@ function calcRms(analyser) {
   return Math.sqrt(sum / data.length);
 }
 
-canvas.width = canvas.clientWidth;
+
+window.addEventListener("DOMContentLoaded", () => {
+  const gateSlider = document.getElementById("gateSlider");
+  const gainSlider = document.getElementById("gainSlider");
+
+  if (gateSlider) {
+    gateSlider.value = 0.01;
+    gateSlider.dispatchEvent(new Event("input"));
+  }
+  if (gainSlider) {
+    gainSlider.value = 0.8;
+    gainSlider.dispatchEvent(new Event("input"));
+  }
+
+  canvas.width = canvas.clientWidth;
 canvas.height = canvas.clientHeight;
 setupMicList();
 
 draw();
+
+});
